@@ -2,6 +2,12 @@
 
 {% block conteudo %}
 
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     <article>
         <h2>{{ evento.nome }}</h2>
         <p>{{ evento.descricao }}</p>
@@ -24,7 +30,15 @@
         </p>
     </article>
 
-    <!-- mudar isso -->
+    {% if perms.eventos.add_inscricaoevento %}
+        {% if inscrito_no_evento %}
+            <a href="{% url 'eventos:desinscrever_evento' evento.id %}">Desinscrever-se do evento</a>
+        {% else %}
+            <a href="{% url 'eventos:inscrever-se_evento' evento.id %}">Inscrever-se no evento</a>
+        {% endif %}
+        <br>
+    {% endif %}
+
     {% if evento.organizador == user %}
         <a href="{% url 'eventos:criar_atividade' evento.id %}">Criar atividade para este evento</a>
         <br>
@@ -60,9 +74,19 @@
         </article>
         
         {% if evento.organizador == user %}
+            <p> -- </p>
             <a href="{% url 'eventos:editar_atividade' atividade.id %}">Editar</a>
             <br>
             <a href="{% url 'eventos:excluir_atividade' atividade.id %}">Excluir</a>
+        {%endif%}
+
+        {% if perms.eventos.add_inscricaoatividade %}
+            <p> -- </p>
+            {% if atividade.ja_inscrito %}
+                <a href="{% url 'eventos:desinscrever_atividade' atividade.id %}">Desinscrever-se da atividade</a>
+            {%else%}
+                <a href="{% url 'eventos:inscrever-se_atividade' atividade.id %}">Inscrever-se na atividade</a>
+            {%endif%}
         {%endif%}
 
         <p>----</p>

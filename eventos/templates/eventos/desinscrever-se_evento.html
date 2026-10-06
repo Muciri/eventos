@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h1>Cancelar inscrição na atividade</h1>
+
+<p>
+    Tem certeza que deseja sair da atividade
+    <strong>{{ atividade.nome }}</strong>?
+</p>
+
+<p>
+    Você continuará inscrito no evento.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <button type="submit">
+        Sim, sair da atividade
+    </button>
+
+    <a href="{% url 'eventos:programacao' %}">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}

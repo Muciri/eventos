@@ -4,6 +4,12 @@
 
     <h1>EVENTOS!</h1>
 
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     {% if perms.eventos.add_evento %}
         <br>
         <a href="{% url 'eventos:criar_evento' %}">criar evento</a>

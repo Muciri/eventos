@@ -4,10 +4,10 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .models import Evento, Atividade, InscricaoEvento
+from .models import Evento, Atividade, InscricaoEvento, InscricaoAtividade
 from .forms import EventoForm, AtividadeForm
 
-from django.db.models import Count, F, Case, When, Value, IntegerField
+from django.db.models import Count, F, Case, When, Value, IntegerField, Exists, OuterRef
 
 def main(request):
     return render(request, "eventos/main.html")
@@ -18,8 +18,29 @@ def programacao(request):
 
 def detalhe_evento(request, id):
     evento = get_object_or_404(Evento, id=id)
-    atividades = Atividade.objects.filter(evento=evento)
-    return render(request, 'eventos/detalhe_evento.html', {'evento': evento, 'atividades': atividades})
+
+    inscrito_no_evento = InscricaoEvento.objects.filter(
+        evento=evento,
+        participante=request.user
+    ).exists()
+
+    atividades = Atividade.objects.filter(
+        evento=evento
+    ).annotate(
+        ja_inscrito=Exists(
+            InscricaoAtividade.objects.filter(
+                atividade=OuterRef('pk'),
+                inscricao_evento__evento=evento,
+                inscricao_evento__participante=request.user
+            )
+        )
+    )
+
+    return render(request, 'eventos/detalhe_evento.html', {
+        'evento': evento,
+        'atividades': atividades,
+        'inscrito_no_evento': inscrito_no_evento,
+    })
 
 @login_required
 def minha_agenda(request):
@@ -239,6 +260,116 @@ def excluir_atividade(request, atividade_id):
     return render(request,'eventos/excluir_atividade.html', {'atividade': atividade,'evento': evento})
 
 @login_required
+def inscrever_evento(request, evento_id):
+    evento = get_object_or_404(Evento, id=evento_id)
+
+    if request.method == 'POST':
+        inscricao_existente = InscricaoEvento.objects.filter(
+            evento=evento,
+            participante=request.user
+        )
+
+        if inscricao_existente.exists():
+            messages.error(request, 'Você já está inscrito neste evento.')
+            return redirect("eventos:programacao")
+
+        if not evento.inscricoes_abertas:
+            messages.error(request, 'As inscrições deste evento estão fechadas.')
+            return redirect("eventos:programacao")
+
+        InscricaoEvento.objects.create(
+            evento=evento,
+            participante=request.user
+        )
+
+        return redirect("eventos:programacao")
+
+    return render(request, 'eventos/inscrever-se_evento.html')
+
+@login_required
+def inscrever_atividade(request, atividade_id):
+    atividade = get_object_or_404(Atividade, id=atividade_id)
+
+    inscricao_evento = InscricaoEvento.objects.filter(
+        evento=atividade.evento,
+        participante=request.user
+    ).first()
+
+    if not inscricao_evento:
+        messages.error(request, 'Você não está inscrito neste evento.')
+        return redirect("eventos:programacao")
+
+    if request.method == "POST":
+        inscricao_existente = InscricaoAtividade.objects.filter(
+            inscricao_evento=inscricao_evento,
+            atividade=atividade
+        ).exists()
+
+        if inscricao_existente:
+            messages.error(request, 'Você já está inscrito nesta atividade.')
+            return redirect("eventos:programacao")
+
+        quantidade_inscritos = InscricaoAtividade.objects.filter(
+            atividade=atividade
+        ).count()
+
+        capacidade_sala = atividade.sala.capacidade
+
+        if quantidade_inscritos >= capacidade_sala:
+            messages.error(request, 'A sala está lotada.')
+            return redirect("eventos:programacao")
+
+        InscricaoAtividade.objects.create(
+            inscricao_evento=inscricao_evento,
+            atividade=atividade
+        )
+
+        return redirect("eventos:programacao")
+
+    return render(request, 'eventos/inscrever-se_atividade.html')
+
+@login_required
+def desinscrever_evento(request, evento_id):
+    evento = get_object_or_404(Evento, id=evento_id)
+
+    inscricao_evento = InscricaoEvento.objects.filter(evento=evento, participante=request.user).first()
+
+    if not inscricao_evento:
+        messages.error(request, 'Você não está inscrito neste evento.')
+        return redirect("eventos:programacao")
+
+    if request.method == "POST":
+        InscricaoAtividade.objects.filter(inscricao_evento=inscricao_evento).delete()
+        inscricao_evento.delete()
+        messages.success(request, 'Você saiu do evento e de todas as suas atividades.')
+
+        return redirect("eventos:programacao")
+
+    return render(request, 'eventos/desinscrever-se_evento.html', {'evento': evento})
+
+@login_required
+def desinscrever_atividade(request, atividade_id):
+    atividade = get_object_or_404(Atividade, id=atividade_id)
+    inscricao_evento = InscricaoEvento.objects.filter(evento=atividade.evento, participante=request.user).first()
+
+    if not inscricao_evento:
+        messages.error(request, 'Você não está inscrito neste evento.')
+        return redirect("eventos:programacao")
+
+    inscricao = InscricaoAtividade.objects.filter(inscricao_evento=inscricao_evento, atividade=atividade).first()
+
+    if not inscricao:
+        messages.error(request, 'Você não está inscrito nesta atividade.')
+        return redirect("eventos:programacao")
+
+    if request.method == "POST":
+        inscricao.delete()
+        messages.success(request,'Você saiu da atividade com sucesso.')
+        return redirect("eventos:programacao")
+
+    return render(request, 'eventos/desinscrever-se_atividade.html', {'atividade': atividade})
+
+@login_required
 def painel_organizador(request):
     atividades = Atividade.objects.filter(responsavel = request.user).annotate(
         quantidade_inscritos = Count("inscricoes")
@@ -252,4 +383,4 @@ def painel_organizador(request):
         output_field=IntegerField()
     ))
 
-    return render(request, 'eventos/painel_organizador.html', {'atividades': atividades})
+    return render(request, 'eventos/inscrever-se_evento.html', {'atividades': atividades})
