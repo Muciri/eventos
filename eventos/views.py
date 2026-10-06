@@ -7,6 +7,8 @@ from django.contrib import messages
 from .models import Evento, Atividade, InscricaoEvento
 from .forms import EventoForm, AtividadeForm
 
+from django.db.models import Count, F, Case, When, Value, IntegerField
+
 def main(request):
     return render(request, "eventos/main.html")
 
@@ -254,3 +256,31 @@ def excluir_atividade(request, atividade_id):
         return redirect('eventos:programacao')
 
     return render(request,'eventos/excluir_atividade.html', {'atividade': atividade,'evento': evento})
+
+@login_required
+def painel_organizador(request):
+    atividades = Atividade.objects.filter(responsavel = request.user.username).annotate(
+        quantidade_inscritos = Count("inscricoes")
+    ).annotate(
+    vagas_restantes=Case(
+        When(
+            sala__isnull=False,
+            then=F("sala__capacidade") - F("quantidade_inscritos")
+        ),
+        default=Value(None),
+        output_field=IntegerField()
+    ))
+
+    # atividades = Atividade.objects.filter(responsavel = request.user).annotate(
+    #     quantidade_inscritos = Count("inscricoes")
+    # ).annotate(
+    # vagas_restantes=Case(
+    #     When(
+    #         sala__isnull=False,
+    #         then=F("sala__capacidade") - F("quantidade_inscritos")
+    #     ),
+    #     default=Value(None),
+    #     output_field=IntegerField()
+    # ))
+
+    return render(request, 'eventos/painel_organizador.html', {'atividades': atividades})

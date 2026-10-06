@@ -8,7 +8,14 @@
 
         {% if user.is_authenticated %}
             <a href="{%url 'eventos:minha_agenda' %}">minha agenda</a>
+
+            {% if perms.eventos.add_evento %}
+                <br>
+                <a href="{% url 'eventos:painel_organizador' %}">Painel de organizador</a>
+            {% endif %}
         {%endif%}
+
+        <br>
     </div>
 
 {% endblock %}

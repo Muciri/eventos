@@ -15,4 +15,5 @@ urlpatterns = [
     path('atividade/<int:atividade_id>/editar/', views.editar_atividade, name='editar_atividade'),
     path('atividade/<int:atividade_id>/excluir/', views.excluir_atividade, name='excluir_atividade'),
     path('minha_agenda', views.minha_agenda, name='minha_agenda'),
+    path('painel_organizador', views.painel_organizador, name='painel_organizador'),
 ]
