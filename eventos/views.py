@@ -19,22 +19,24 @@ def programacao(request):
 def detalhe_evento(request, id):
     evento = get_object_or_404(Evento, id=id)
 
-    inscrito_no_evento = InscricaoEvento.objects.filter(
-        evento=evento,
-        participante=request.user
-    ).exists()
+    inscrito_no_evento = False
+    atividades = Atividade.objects.filter(evento=evento)
 
-    atividades = Atividade.objects.filter(
-        evento=evento
-    ).annotate(
-        ja_inscrito=Exists(
-            InscricaoAtividade.objects.filter(
-                atividade=OuterRef('pk'),
-                inscricao_evento__evento=evento,
-                inscricao_evento__participante=request.user
+    if request.user.is_authenticated:
+        inscrito_no_evento = InscricaoEvento.objects.filter(
+            evento=evento,
+            participante=request.user
+        ).exists()
+
+        atividades = atividades.annotate(
+            ja_inscrito=Exists(
+                InscricaoAtividade.objects.filter(
+                    atividade=OuterRef('pk'),
+                    inscricao_evento__evento=evento,
+                    inscricao_evento__participante=request.user
+                )
             )
         )
-    )
 
     return render(request, 'eventos/detalhe_evento.html', {
         'evento': evento,
@@ -383,4 +385,4 @@ def painel_organizador(request):
         output_field=IntegerField()
     ))
 
-    return render(request, 'eventos/inscrever-se_evento.html', {'atividades': atividades})
+    return render(request, 'eventos/painel_organizador.html', {'atividades': atividades})
