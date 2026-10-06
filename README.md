@@ -19,8 +19,6 @@
 - Gabriel (participante)
     - username: Gabriel
     - senha: ifpb1234
-  
-Claro. Com base nas telas, dá para documentar os dados de teste de forma bem simples, separando por **Atividades, Eventos e Inscrições**.
 
  ## Documentação — Dados de Teste
 
