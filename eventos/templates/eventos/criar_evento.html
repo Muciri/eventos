@@ -1,10 +1,16 @@
-<h1>Criar Evento</h1>
+{% extends "base.html" %}
 
-<form method="post">
-    {% csrf_token %}
+{% block conteudo %}
 
-    <p><a href="{% url 'eventos:programacao' %}">Voltar</a></p>
-    {{ form.as_p }}
+    <h1>Criar Evento</h1>
 
-    <button type="submit">Salvar</button>
-</form>
+    <form method="post">
+        {% csrf_token %}
+
+        <p><a href="{% url 'eventos:programacao' %}">Voltar</a></p>
+        {{ form.as_p }}
+
+        <button type="submit">Salvar</button>
+    </form>
+
+{% endblock %}

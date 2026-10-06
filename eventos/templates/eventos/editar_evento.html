@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+    <h1>Editar Evento</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            <a href="{% url 'eventos:programacao' %}">
+                Voltar
+            </a>
+        </p>
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Salvar Alterações
+        </button>
+    </form>
+
+{% endblock %}

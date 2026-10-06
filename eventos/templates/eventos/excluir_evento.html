@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+    <h1>Excluir Evento</h1>
+
+    <p>
+        Tem certeza que deseja excluir o evento
+        <strong>{{ evento.nome }}</strong>?
+    </p>
+
+    <p>
+        Esta ação não poderá ser desfeita.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <button type="submit">
+            Confirmar Exclusão
+        </button>
+    </form>
+
+    <br>
+
+    <a href="{% url 'eventos:programacao' %}">
+        Cancelar
+    </a>
+
+{% endblock %}
