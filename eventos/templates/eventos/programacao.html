@@ -4,6 +4,11 @@
 
     <h1>EVENTOS!</h1>
 
+    {% if perms.eventos.add_evento %}
+        <br>
+        <a href="{% url 'eventos:criar_evento' %}">criar evento</a>
+    {% endif %}
+
     {% for evento in eventos %}
         <p> ---- </p>
 

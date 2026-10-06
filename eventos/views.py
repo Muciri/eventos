@@ -23,15 +23,12 @@ def detalhe_evento(request, id):
 
 @login_required
 def minha_agenda(request):
-    #TODO: atualmente, o model InscricaoEvento só tem o campo 'participante', não uma ForeignKey para um usuario, depois tem que mudar isso.
-    #TODO: também mudar aqui pra filtrar inscricoes de eventos do usuario logado, não pegar pelo Username igual
-    inscricoes_eventos = InscricaoEvento.objects.filter(participante = request.user.username)
+    inscricoes_eventos = InscricaoEvento.objects.filter(participante = request.user)
 
     return render(request, 'eventos/minha_agenda.html', {'inscricoes_eventos': inscricoes_eventos})
 
 @login_required
 def criar_evento(request):
-    #TODO: atualmente, o model Evento também só tem um campo 'organizador' sem um usuario, só o nome do cara, depois tem que mudar isso e mudar a logica aqui tbm
     if not request.user.groups.filter(name="Organizadores").exists():
         return redirect('eventos:main')
 
@@ -40,8 +37,7 @@ def criar_evento(request):
 
         if form.is_valid():
             evento = form.save(commit=False)
-            evento.organizador = request.user.username
-            #evento.organizador = request.user
+            evento.organizador = request.user
             evento.save()
             
             messages.success(request, 'Criação do Evento deu certo!')
@@ -58,11 +54,8 @@ def editar_evento(request, evento_id):
 
     evento = get_object_or_404(Evento, id=evento_id)
 
-    if evento.organizador != request.user.username:
+    if evento.organizador != request.user:
         return redirect('eventos:main')
-
-    # if evento.organizador != request.user:
-    #     return redirect('eventos:main')
 
     if request.method == 'POST':
         form = EventoForm(request.POST, instance=evento)
@@ -89,11 +82,8 @@ def excluir_evento(request, evento_id):
 
     evento = get_object_or_404(Evento, id=evento_id)
 
-    if evento.organizador != request.user.username:
+    if evento.organizador != request.user:
         return redirect('eventos:main')
-
-    # if evento.organizador != request.user:
-    #     return redirect('eventos:main')
 
     if request.method == 'POST':
         evento.delete()
@@ -121,11 +111,8 @@ def criar_atividade(request, evento_id):
 
     evento = get_object_or_404(Evento, id=evento_id)
 
-    if evento.organizador != request.user.username:
+    if evento.organizador != request.user:
         return redirect('eventos:main')
-
-    # if evento.organizador != request.user:
-    #     return redirect('eventos:main')
 
     if request.method == 'POST':
         form = AtividadeForm(request.POST)
@@ -188,11 +175,8 @@ def editar_atividade(request, atividade_id):
 
     evento = atividade.evento
 
-    if evento.organizador != request.user.username:
+    if evento.organizador != request.user:
         return redirect('eventos:main')
-
-    # if evento.organizador != request.user:
-    #     return redirect('eventos:main')
 
     if request.method == 'POST':
         form = AtividadeForm(request.POST, instance=atividade)
@@ -243,11 +227,8 @@ def excluir_atividade(request, atividade_id):
 
     evento = atividade.evento
 
-    if evento.organizador != request.user.username:
+    if evento.organizador != request.user:
         return redirect('eventos:main')
-
-    # if evento.organizador != request.user:
-    #     return redirect('eventos:main')
 
     if request.method == 'POST':
         atividade.delete()
@@ -259,7 +240,7 @@ def excluir_atividade(request, atividade_id):
 
 @login_required
 def painel_organizador(request):
-    atividades = Atividade.objects.filter(responsavel = request.user.username).annotate(
+    atividades = Atividade.objects.filter(responsavel = request.user).annotate(
         quantidade_inscritos = Count("inscricoes")
     ).annotate(
     vagas_restantes=Case(
@@ -270,17 +251,5 @@ def painel_organizador(request):
         default=Value(None),
         output_field=IntegerField()
     ))
-
-    # atividades = Atividade.objects.filter(responsavel = request.user).annotate(
-    #     quantidade_inscritos = Count("inscricoes")
-    # ).annotate(
-    # vagas_restantes=Case(
-    #     When(
-    #         sala__isnull=False,
-    #         then=F("sala__capacidade") - F("quantidade_inscritos")
-    #     ),
-    #     default=Value(None),
-    #     output_field=IntegerField()
-    # ))
 
     return render(request, 'eventos/painel_organizador.html', {'atividades': atividades})

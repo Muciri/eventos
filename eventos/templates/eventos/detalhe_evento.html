@@ -25,7 +25,7 @@
     </article>
 
     <!-- mudar isso -->
-    {% if evento.organizador == user.username %}
+    {% if evento.organizador == user %}
         <a href="{% url 'eventos:criar_atividade' evento.id %}">Criar atividade para este evento</a>
         <br>
         <a href="{% url 'eventos:editar_evento' evento.id %}">Editar</a>
@@ -59,7 +59,7 @@
             <p><strong>Fim:</strong> {{ atividade.fim }}</p>
         </article>
         
-        {% if evento.organizador == user.username %}
+        {% if evento.organizador == user %}
             <a href="{% url 'eventos:editar_atividade' atividade.id %}">Editar</a>
             <br>
             <a href="{% url 'eventos:excluir_atividade' atividade.id %}">Excluir</a>

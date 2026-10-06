@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 class Sala(models.Model):
@@ -14,7 +15,12 @@ class Evento(models.Model):
     inicio = models.DateTimeField()
     fim = models.DateTimeField()
     inscricoes_abertas = models.BooleanField(default=True)
-    organizador = models.CharField(max_length=150)
+
+    organizador = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="eventos_organizados"
+    )
 
     def __str__(self):
         return self.nome
@@ -28,7 +34,13 @@ class Atividade(models.Model):
     titulo = models.CharField(max_length=200)
     tipo = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
-    responsavel = models.CharField(max_length=150)
+
+    responsavel = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="atividades_responsaveis"
+    )
+
     sala = models.ForeignKey(
         Sala,
         on_delete=models.SET_NULL,
@@ -48,7 +60,13 @@ class InscricaoEvento(models.Model):
         on_delete=models.CASCADE,
         related_name="inscricoes"
     )
-    participante = models.CharField(max_length=150)
+
+    participante = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="inscricoes_eventos"
+    )
+
     data = models.DateTimeField(auto_now_add=True)
 
     class Meta:
