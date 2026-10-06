@@ -1,0 +1,43 @@
+<!--
+
+    A MUDAR!!!!!!!!!!1
+    
+-->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>{% block titulo %}Blog IFPB{% endblock %}</title>
+</head>
+<body>
+  <header>
+    
+    <nav>
+        {% if user.is_authenticated %}
+            <span>Olá, {{ user.username }}!</span>
+            <br> <br>
+            <a href="{% url 'password_change' %}">Alterar senha</a>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                  Sair
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Entrar</a>
+            <br>
+            <a href="{% url 'register' %}">Cadastrar-se</a>
+        {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>IFPB — {% now "Y" %}</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+    <h1>EVENTOS!</h1>
+
+    {% for evento in eventos %}
+        <p> ---- </p>
+
+        <article>
+            <h2>{{ evento.nome }}</h2>
+            <p>{{ evento.descricao }}</p>
+            <p>
+                <strong>Início:</strong> {{ evento.inicio }}
+            </p>
+            <p>
+                <strong>Fim:</strong> {{ evento.fim }}
+            </p>
+            <p>
+                <strong>Organizador:</strong> {{ evento.organizador }}
+            </p>
+            <p>
+                <strong>Inscrições:</strong>
+                {% if evento.inscricoes_abertas %}
+                    Abertas
+                {% else %}
+                    Encerradas
+                {% endif %}
+            </p>
+            <a href="{% url 'eventos:evento' evento.id %}">Ver Detalhes</a>
+        </article>
+    {%endfor%}
+
+{% endblock %}

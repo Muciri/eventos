@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+    <article>
+        <h2>{{ evento.nome }}</h2>
+        <p>{{ evento.descricao }}</p>
+        <p>
+            <strong>Início:</strong> {{ evento.inicio }}
+        </p>
+        <p>
+            <strong>Fim:</strong> {{ evento.fim }}
+        </p>
+        <p>
+            <strong>Organizador:</strong> {{ evento.organizador }}
+        </p>
+        <p>
+            <strong>Inscrições:</strong>
+            {% if evento.inscricoes_abertas %}
+                Abertas
+            {% else %}
+                Encerradas
+            {% endif %}
+        </p>
+    </article>
+
+    <p>----</p>
+    <h3>ATIVIDADES:</h3>
+    {% for atividade in atividades %}
+        <article>
+            <h4>{{ atividade.titulo }}</h4>
+
+            <p><strong>Tipo:</strong> {{ atividade.tipo }}</p>
+
+            <p><strong>Descrição:</strong> {{ atividade.descricao }}</p>
+
+            <p><strong>Responsável:</strong> {{ atividade.responsavel }}</p>
+
+            <p>
+                <strong>Sala:</strong>
+                {% if atividade.sala %}
+                    {{ atividade.sala }}
+                {% else %}
+                    Não definida
+                {% endif %}
+            </p>
+
+            <p><strong>Início:</strong> {{ atividade.inicio }}</p>
+
+            <p><strong>Fim:</strong> {{ atividade.fim }}</p>
+        </article>
+        <p>----</p>
+    {% empty %}
+        <p>Não há atividades para este evento.</p>
+    {% endfor %}
+
+
+
+
+{% endblock %}

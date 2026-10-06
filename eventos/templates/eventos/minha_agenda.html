@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+    <h1>Minha Agenda</h1>
+
+    {% if inscricoes_eventos %}
+        {% for inscricao in inscricoes_eventos %}
+
+            <h2>{{ inscricao.evento }}</h2>
+
+            <p>
+                Inscrito em: {{ inscricao.data|date:"d/m/Y H:i" }}
+            </p>
+
+            <h3>Atividades</h3>
+
+            {% if inscricao.inscricoes_atividades.all %}
+                <ul>
+                    {% for inscricao_atividade in inscricao.inscricoes_atividades.all %}
+                        <li>
+                            {{ inscricao_atividade.atividade.titulo }}
+                            - {{ inscricao_atividade.data|date:"d/m/Y H:i" }}
+                        </li>
+                    {% empty %}
+                        <li>Nenhuma atividade inscrita.</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <hr>
+
+        {% endfor %}
+    {% else %}
+        <p>Você ainda não está inscrito em nenhum evento.</p>
+    {% endif %}
+
+{% endblock %}
