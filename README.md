@@ -7,16 +7,16 @@
 - ifpb (superuser)
    - username: ifpb
    - senha: ifpb
-- Murilo
+- Murilo (organizador)
     - username: Murilo
     - senha: ifpb1234
-- Francisco
+- Francisco (organizador)
     - username: Francisco
     - senha: senha: ifpb1234
-- Felipe
+- Felipe (participante)
     - username: Felipe
     - senha: ifpb1234
-- Gabriel
+- Gabriel (participante)
     - username: Gabriel
     - senha: ifpb1234
   
@@ -32,7 +32,7 @@ Claro. Com base nas telas, dá para documentar os dados de teste de forma bem si
 | --- | --- | --- | --- | --- |
 | Curso Django | IFTech | Murilo | Programado | Sala Informática 01 |
 | Curso de Spring | IFTech | Murilo | Programado | Sala Informática 01 |
-| Curso de NBN | Pulsar 2026 | Francisco | Programado | Sala Informática 07 |
+| Curso de NBN | Pulsar 2026 | Francisco | Programado | Sala Informática 02 |
 | Curso de POO | Pulsar 2026 | Francisco | Programado | Sala Pequena |
 
 ---
